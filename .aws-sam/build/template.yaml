@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'sam-app
+
+  Sample SAM Template for sam-app
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  WeatherApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Auth:
+        ApiKeyRequired: true
+  GetWeatherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetWeatherFunction
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Events:
+        GetWeather:
+          Type: Api
+          Properties:
+            Path: /getWeather
+            Method: get
+            RestApiId:
+              Ref: WeatherApi
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Description: Weather Api Key
+      Enabled: true
+      StageKeys:
+      - RestApiId:
+          Ref: WeatherApi
+        StageName: dev
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+      - ApiId:
+          Ref: WeatherApi
+        Stage: dev
+      Description: Bo usage plan
+      Quota:
+        Limit: 5000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 200
+        RateLimit: 100
+      UsagePlanName: bo-usage-plan
+  UsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId:
+        Ref: ApiKey
+      KeyType: API_KEY
+      UsagePlanId:
+        Ref: UsagePlan
+Outputs:
+  ApiId:
+    Description: My Api Id
+    Value:
+      Ref: WeatherApi

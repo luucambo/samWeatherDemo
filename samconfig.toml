@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "bo-app"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ahc4z6v1dqu4"
+s3_prefix = "bo-app"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
